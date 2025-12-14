@@ -1,15 +1,16 @@
 <!DOCTYPE html>
-<html>
+<html lang="es">
 <head>
+    <meta charset="UTF-8">
     <title>Dashboard WiFi</title>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <link rel="stylesheet" href="/static/css/style.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2"></script>
-
 </head>
 <body>
+<div class="container">
 
-<h1>Dashboard WiFi</h1>
+<h1>Dashboard WiFi - </h1> <p id="fechaHora"></p>
 <div id="alert"></div>
 
 <table id="deviceTable">
@@ -32,6 +33,22 @@
     <a href="/download/excel">📊 Descargar Excel</a>
 </div>
 
+</div>
 <script src="/static/js/dashboard.js"></script>
+
+<script>
+        function actualizarFechaHora() {
+            const ahora = new Date();
+            const fechaHora = ahora.toLocaleString(); // Formato local
+            document.getElementById("fechaHora").textContent = fechaHora;
+        }
+
+        // Actualizar cada segundo
+        setInterval(actualizarFechaHora, 1000);
+
+        // Mostrar inmediatamente al cargar
+        actualizarFechaHora();
+    </script>
+
 </body>
 </html>

@@ -9,7 +9,7 @@ function loadDevices() {
 
             if (data.new_devices.length > 0) {
                 document.getElementById("alert").innerHTML =
-                    "🚨 Nuevo dispositivo conectado: " + data.new_devices.join(", ");
+                    "!! Nuevo dispositivo conectado: " + data.new_devices.join(", ");
             }
         });
 }
@@ -44,20 +44,34 @@ function updateRadar(devices) {
             datasets: [{
                 label: "Distancia estimada (m)",
                 data: distances,
-                backgroundColor: 'rgba(54, 162, 235, 0.2)',
-                borderColor: 'rgba(54, 162, 235, 1)',
+                backgroundColor: 'rgba(255,0,0,0.2)',
+                borderColor: 'rgba(255,0,0,1)',
                 borderWidth: 1
             }]
         },
         options: {
             scales: {
                 r: {
-                    beginAtZero: true
+                    angleLines: {
+                        color: 'red'
+                    },
+                    grid: {
+                        color: 'red'
+                    },
+                    pointLabels: {
+                        color: 'red',
+                        font: {
+                            size: 12
+                        }
+                    },
+                    ticks: {
+                        color: 'red'
+                    }
                 }
             },
             plugins: {
                 datalabels: {
-                    color: 'black',
+                    color: 'red',  // texto fijo sobre cada punto
                     align: 'top',
                     formatter: function(value, context) {
                         const d = devices[context.dataIndex];
@@ -72,8 +86,15 @@ function updateRadar(devices) {
                         size: 10
                     }
                 },
+                legend: {
+                    labels: {
+                        color: 'red'
+                    }
+                },
                 tooltip: {
-                    enabled: false  // opcional: desactiva tooltip si no lo quieres
+                    titleColor: 'red',
+                    bodyColor: 'red',
+                    backgroundColor: '#000'
                 }
             }
         },

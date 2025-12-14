@@ -1,7 +1,8 @@
 from flask import Flask, jsonify, render_template, send_file
 from network_scanner import scan_network
 from exporter import export_excel, export_pdf
-
+from datetime import datetime
+import requests
 app = Flask(__name__)
 
 known_devices = set()
