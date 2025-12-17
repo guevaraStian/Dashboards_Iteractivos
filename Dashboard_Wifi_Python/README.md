@@ -28,8 +28,8 @@ Despues de haber instalado python y confirmar la version, instalamos git y desca
 ```Terminal de comandos
 git --version
 git init
-git clone https://github.com/guevaraStian/CRUD_Python_MySql.git
-cd CRUD_Python_MySql
+git clone https://github.com/guevaraStian/Dashboards_Iterativos/Dashboard_Wifi_Python.git
+cd Dashboards_Iterativos/Dashboard_Wifi_Python
 git push origin master
 ```
 
