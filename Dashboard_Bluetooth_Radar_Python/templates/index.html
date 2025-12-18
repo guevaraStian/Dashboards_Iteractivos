@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<title> Radar Bluetooth BLE</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<link rel="stylesheet" href="/static/style.css">
+
+<!-- Chart.js -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<!-- Labels fijos -->
+<script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2"></script>
+
+<!-- Exportación -->
+<script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+</head>
+
+<body>
+
+<h1>📡 Radar Bluetooth BLE</h1>
+<div id="clock"></div>
+
+<div class="container" id="capture">
+
+    <div class="table-container">
+        <table id="dataTable">
+            <thead>
+                <tr>
+                    <th>#</th>
+                    <th>MAC</th>
+                    <th>Nombre</th>
+                    <th>Distancia (m)</th>
+                </tr>
+            </thead>
+            <tbody id="table"></tbody>
+        </table>
+    </div>
+
+    <div class="chart-container">
+        <canvas id="radar"></canvas>
+    </div>
+
+</div>
+
+<div class="buttons">
+    <button onclick="downloadPDF()">📄 Descargar PDF</button>
+    <button onclick="downloadExcel()">📊 Descargar Excel</button>
+</div>
+
+<script>
+let radarChart;
+let currentDevices = [];
+
+/* ⏰ Hora y fecha */
+function updateClock() {
+    const now = new Date();
+    document.getElementById("clock").innerText =
+        now.toLocaleDateString() + " " + now.toLocaleTimeString();
+}
+setInterval(updateClock, 1000);
+updateClock();
+
+/* 📡 Dashboard */
+function updateDashboard() {
+    fetch("/api/devices")
+        .then(res => res.json())
+        .then(devices => {
+            currentDevices = devices;
+            const table = document.getElementById("table");
+            table.innerHTML = "";
+
+            const labels = [];
+            const data = [];
+            const meta = [];
+
+            devices.forEach((d, i) => {
+                table.innerHTML += `
+                    <tr>
+                        <td>${i + 1}</td>
+                        <td>${d.mac}</td>
+                        <td>${d.name}</td>
+                        <td>${d.distance ?? "?"}</td>
+                    </tr>`;
+
+                if (d.distance !== null) {
+                    labels.push(d.mac);
+                    data.push(Math.max(0.1, 10 - d.distance));
+                    meta.push(`${d.mac}\n${d.distance} m`);
+                }
+            });
+
+            if (radarChart) radarChart.destroy();
+
+            radarChart = new Chart(document.getElementById("radar"), {
+                type: "radar",
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        data: data,
+                        backgroundColor: "rgba(255,0,0,0.25)",
+                        borderColor: "red",
+                        borderWidth: 2,
+                        pointBackgroundColor: "red"
+                    }]
+                },
+                options: {
+                    plugins: {
+                        legend: { display: false },
+                        datalabels: {
+                            color: "red",
+                            font: { weight: "bold", size: 10 },
+                            formatter: (v, ctx) => meta[ctx.dataIndex]
+                        }
+                    },
+                    scales: {
+                        r: {
+                            min: 0,
+                            max: 10,
+                            ticks: { color: "white", backdropColor: "black" },
+                            grid: { color: "#444" },
+                            pointLabels: { color: "red" }
+                        }
+                    }
+                },
+                plugins: [ChartDataLabels]
+            });
+        });
+}
+
+updateDashboard();
+setInterval(updateDashboard, 10000);
+
+/*  PDF */
+function downloadPDF() {
+    html2canvas(document.getElementById("capture")).then(canvas => {
+        const img = canvas.toDataURL("image/png");
+        const pdf = new jspdf.jsPDF("p", "mm", "a4");
+        const width = 190;
+        const height = canvas.height * width / canvas.width;
+        pdf.addImage(img, "PNG", 10, 10, width, height);
+        pdf.save("ble_dashboard.pdf");
+    });
+}
+
+/*  Excel */
+function downloadExcel() {
+    const wsData = [
+        ["#", "MAC", "Nombre", "Distancia (m)"]
+    ];
+
+    currentDevices.forEach((d, i) => {
+        wsData.push([i + 1, d.mac, d.name, d.distance]);
+    });
+
+    const ws = XLSX.utils.aoa_to_sheet(wsData);
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, "BLE");
+
+    XLSX.writeFile(wb, "ble_dashboard.xlsx");
+}
+</script>
+
+</body>
+</html>

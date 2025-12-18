@@ -1,0 +1,79 @@
+body {
+    margin: 0;
+    padding: 10px;
+    font-family: Arial, sans-serif;
+    background: black;
+    color: white;
+}
+
+h1 {
+    text-align: center;
+    color: red;
+}
+
+#clock {
+    text-align: center;
+    margin-bottom: 15px;
+}
+
+.container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px;
+}
+
+.table-container,
+.chart-container {
+    flex: 1 1 400px;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    background: #444;
+}
+
+th {
+    background: red;
+    color: black;
+    padding: 10px;
+}
+
+td {
+    padding: 8px;
+    border: 1px solid #666;
+    color: white;
+}
+
+canvas {
+    background: black;
+    border: 2px solid red;
+    border-radius: 10px;
+    padding: 10px;
+}
+
+.buttons {
+    text-align: center;
+    margin-top: 20px;
+}
+
+button {
+    background: red;
+    color: black;
+    border: none;
+    padding: 12px 20px;
+    font-size: 16px;
+    margin: 5px;
+    cursor: pointer;
+    border-radius: 5px;
+}
+
+button:hover {
+    background: #ff5555;
+}
+
+@media (max-width: 768px) {
+    .container {
+        flex-direction: column;
+    }
+}
