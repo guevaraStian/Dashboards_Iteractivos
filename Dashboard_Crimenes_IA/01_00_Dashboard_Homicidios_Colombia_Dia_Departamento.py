@@ -1,3 +1,8 @@
+# DASHBOARD DE HOMICIDIOS COLOMBIA POR DEPARTAMENTO
+# CON INTELIGENCIA ARTIFICIAL, MACHINE LEARNING Y REGRESION LINEAL
+# TAMBIEN HAY GRAFICAS DEL DASHBOARD FILTRADA POR DIA, MES, AÑO Y DEPARTAMENTO
+# TAMBIEN HAY UN MAPA QUE MUESTRAN LOS DATOS POR DIA
+
 import requests
 import pandas as pd
 import dash
@@ -7,9 +12,7 @@ import plotly.express as px
 import plotly.graph_objects as go
 from datetime import datetime
 
-# =======================
-# CONSUMO DE API
-# =======================
+# Se guardan la variables relacionadas a la api
 URL = "https://www.datos.gov.co/resource/m8fd-ahd9.json"
 params = {"$limit": 1000000}
 
@@ -19,9 +22,7 @@ response.raise_for_status()
 data = response.json()
 df = pd.DataFrame(data)
 
-# =======================
-# MANEJO DE FECHAS
-# =======================
+# Se limpia la informacion relacionada a las fechas
 posibles_fechas = ["fecha_hecho", "fecha", "fecha_del_hecho"]
 col_fecha = next((c for c in posibles_fechas if c in df.columns), None)
 
@@ -41,9 +42,7 @@ df[["anio", "mes", "dia"]] = df[["anio", "mes", "dia"]].astype(int)
 
 anios_disponibles = sorted(df["anio"].unique())
 
-# =======================
-# CENTROIDES
-# =======================
+# Se indica la ubicacion de cada departamento
 centroides_departamentos = {
     "AMAZONAS": [-69.9333, -1.4433],
     "ANTIOQUIA": [-75.5636, 6.2518],
@@ -79,9 +78,7 @@ centroides_departamentos = {
     "VICHADA": [-69.1000, 4.6000],
 }
 
-# =======================
-# DASHBOARD
-# =======================
+# Posteriormente se crea el dashboard
 app = dash.Dash(__name__)
 
 fecha_actual = datetime.now().strftime("%d/%m/%Y %H:%M:%S")
@@ -145,9 +142,7 @@ app.layout = html.Div(
     ]
 )
 
-# =======================
-# CALLBACKS
-# =======================
+# Luego se crean los callback
 @app.callback(
     Output("select-mes", "options"),
     Output("select-mes", "value"),
@@ -222,8 +217,6 @@ def actualizar_dashboard(anio, mes, dia):
 
     return data_tabla, columnas, fig_barras, fig_mapa
 
-# =======================
-# MAIN
-# =======================
+# Se procede a ejecutar el main
 if __name__ == "__main__":
     app.run(debug=True)
